@@ -1,8 +1,6 @@
 package com.tecsup.teclunchadmin.controller;
 
-import com.tecsup.teclunchadmin.model.Categoria;
 import com.tecsup.teclunchadmin.model.Item;
-import com.tecsup.teclunchadmin.service.CategoriaService;
 import com.tecsup.teclunchadmin.service.ItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -19,9 +17,6 @@ public class ItemController {
     @Autowired
     private ItemService itemService;
 
-    @Autowired
-    private CategoriaService categoriaService;
-
     @GetMapping
     public List<Item> getAllItems() {
         return itemService.findAll();
@@ -34,24 +29,16 @@ public class ItemController {
     }
 
     @PostMapping
-    public ResponseEntity<Item> createItem(@RequestBody Item item, @RequestParam Long categoriaId) {
-        Optional<Categoria> categoria = categoriaService.findById(categoriaId);
-        if (categoria.isPresent()) {
-            item.setCategoria(categoria.get());
-            Item createdItem = itemService.save(item);
-            return new ResponseEntity<>(createdItem, HttpStatus.CREATED);
-        } else {
-            return ResponseEntity.badRequest().body(null);
-        }
+    public ResponseEntity<Item> createItem(@RequestBody Item item) {
+        Item createdItem = itemService.save(item);
+        return new ResponseEntity<>(createdItem, HttpStatus.CREATED);
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity<Item> updateItem(@PathVariable Long id, @RequestBody Item item, @RequestParam Long categoriaId) {
+    public ResponseEntity<Item> updateItem(@PathVariable Long id, @RequestBody Item item) {
         Optional<Item> existingItem = itemService.findById(id);
-        Optional<Categoria> categoria = categoriaService.findById(categoriaId);
-        if (existingItem.isPresent() && categoria.isPresent()) {
+        if (existingItem.isPresent()) {
             item.setId(id);
-            item.setCategoria(categoria.get());
             Item updatedItem = itemService.save(item);
             return ResponseEntity.ok(updatedItem);
         } else {

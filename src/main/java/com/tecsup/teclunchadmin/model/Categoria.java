@@ -1,5 +1,6 @@
 package com.tecsup.teclunchadmin.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 import java.util.List;
 
@@ -14,7 +15,7 @@ public class Categoria {
     @Column(unique = true, nullable = false)
     private String nombre;
 
-    // Relación uno a muchos con Item
+    @JsonIgnore
     @OneToMany(mappedBy = "categoria", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<Item> items;
 
