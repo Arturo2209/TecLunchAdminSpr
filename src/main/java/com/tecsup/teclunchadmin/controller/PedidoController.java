@@ -2,8 +2,10 @@ package com.tecsup.teclunchadmin.controller;
 
 import com.tecsup.teclunchadmin.model.Pedido;
 import com.tecsup.teclunchadmin.model.Usuario;
+import com.tecsup.teclunchadmin.model.Reserva;
 import com.tecsup.teclunchadmin.service.PedidoService;
 import com.tecsup.teclunchadmin.service.UsuarioService;
+import com.tecsup.teclunchadmin.service.ReservaService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +13,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -23,9 +26,12 @@ public class PedidoController {
     @Autowired
     private UsuarioService usuarioService;
 
+    @Autowired
+    private ReservaService reservaService;
+
     @GetMapping
-    public List<Pedido> getAllPedidos() {
-        return pedidoService.findAll();
+    public ResponseEntity<List<Pedido>> getAllPedidos() {
+        return ResponseEntity.ok(pedidoService.findAll());
     }
 
     @GetMapping("/{id}")
@@ -35,27 +41,21 @@ public class PedidoController {
     }
 
     @PostMapping
-    public ResponseEntity<Pedido> createPedido(@RequestParam String usuarioId, @RequestBody Pedido pedido) {
-        Optional<Usuario> usuario = usuarioService.findById(usuarioId);
-        if (usuario.isPresent()) {
+    public ResponseEntity<Pedido> createPedido(@RequestBody Map<String, Object> payload) {
+        String idInstitucional = (String) payload.get("usuarioId");
+        Optional<Usuario> usuario = usuarioService.findById(idInstitucional);
+        Optional<Reserva> reserva = reservaService.findById(Long.valueOf(payload.get("reservaId").toString()));
+
+        if (usuario.isPresent() && reserva.isPresent()) {
+            Pedido pedido = new Pedido();
             pedido.setUsuario(usuario.get());
-            pedido.setFechaPedido(LocalDate.now());
+            pedido.setReserva(reserva.get());
+            pedido.setFechaPedido(LocalDate.parse((String) payload.get("fechaPedido")));
+            pedido.setEstado((String) payload.get("estado"));
             Pedido createdPedido = pedidoService.save(pedido);
             return new ResponseEntity<>(createdPedido, HttpStatus.CREATED);
         } else {
             return ResponseEntity.badRequest().body(null);
-        }
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Pedido> updatePedido(@PathVariable Long id, @RequestBody Pedido pedido) {
-        Optional<Pedido> existingPedido = pedidoService.findById(id);
-        if (existingPedido.isPresent()) {
-            pedido.setId(id);
-            Pedido updatedPedido = pedidoService.save(pedido);
-            return ResponseEntity.ok(updatedPedido);
-        } else {
-            return ResponseEntity.notFound().build();
         }
     }
 

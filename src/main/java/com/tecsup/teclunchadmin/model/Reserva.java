@@ -29,18 +29,8 @@ public class Reserva {
     @OneToMany(mappedBy = "reserva", cascade = CascadeType.ALL, orphanRemoval = true)
     private List<ReservaItem> reservaItems;
 
-    // Constructor sin argumentos
-    public Reserva() {}
-
-    // Constructor con argumentos
-    public Reserva(Usuario usuario, LocalDate fechaReserva, String estado) {
-        this.usuario = usuario;
-        this.fechaReserva = fechaReserva;
-        this.fechaHoraCreacion = LocalDateTime.now();
-        this.estado = estado;
-    }
-
     // Getters y Setters
+
     public Long getId() {
         return id;
     }
@@ -87,15 +77,5 @@ public class Reserva {
 
     public void setReservaItems(List<ReservaItem> reservaItems) {
         this.reservaItems = reservaItems;
-    }
-
-    @Override
-    public String toString() {
-        return "Reserva{" +
-                "id=" + id +
-                ", usuario=" + usuario +
-                ", fechaReserva=" + fechaReserva +
-                ", estado='" + estado + '\'' +
-                '}';
     }
 }

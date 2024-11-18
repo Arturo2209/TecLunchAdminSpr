@@ -3,7 +3,7 @@ package com.tecsup.teclunchadmin.model;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "PedidoItem")
+@Table(name = "pedidoitem")
 public class PedidoItem {
 
     @Id
@@ -21,17 +21,7 @@ public class PedidoItem {
     @Column(name = "cantidad", nullable = false)
     private Integer cantidad;
 
-    // Constructor sin argumentos
-    public PedidoItem() {}
-
-    // Constructor con argumentos
-    public PedidoItem(Pedido pedido, Item item, Integer cantidad) {
-        this.pedido = pedido;
-        this.item = item;
-        this.cantidad = cantidad;
-    }
-
-    // Getters y Setters
+    // Getters y setters
     public Long getId() {
         return id;
     }
@@ -62,14 +52,5 @@ public class PedidoItem {
 
     public void setCantidad(Integer cantidad) {
         this.cantidad = cantidad;
-    }
-
-    @Override
-    public String toString() {
-        return "PedidoItem{" +
-                "id=" + id +
-                ", item=" + item +
-                ", cantidad=" + cantidad +
-                '}';
     }
 }

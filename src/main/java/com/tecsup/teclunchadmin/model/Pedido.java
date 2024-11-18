@@ -2,10 +2,9 @@ package com.tecsup.teclunchadmin.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDate;
-import java.util.List;
 
 @Entity
-@Table(name = "Pedido")
+@Table(name = "pedido")
 public class Pedido {
 
     @Id
@@ -17,7 +16,7 @@ public class Pedido {
     private Usuario usuario;
 
     @ManyToOne
-    @JoinColumn(name = "reserva_id")
+    @JoinColumn(name = "reserva_id", nullable = true)
     private Reserva reserva;
 
     @Column(name = "fecha_pedido", nullable = false)
@@ -26,20 +25,11 @@ public class Pedido {
     @Column(name = "estado", nullable = false)
     private String estado;
 
-    @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL, orphanRemoval = true)
-    private List<PedidoItem> pedidoItems;
+    @ManyToOne
+    @JoinColumn(name = "carta_id", nullable = true)
+    private Carta carta;
 
-    // Constructor sin argumentos
-    public Pedido() {}
-
-    // Constructor con argumentos
-    public Pedido(Usuario usuario, LocalDate fechaPedido, String estado) {
-        this.usuario = usuario;
-        this.fechaPedido = fechaPedido;
-        this.estado = estado;
-    }
-
-    // Getters y Setters
+    // Getters y setters
     public Long getId() {
         return id;
     }
@@ -80,21 +70,11 @@ public class Pedido {
         this.estado = estado;
     }
 
-    public List<PedidoItem> getPedidoItems() {
-        return pedidoItems;
+    public Carta getCarta() {
+        return carta;
     }
 
-    public void setPedidoItems(List<PedidoItem> pedidoItems) {
-        this.pedidoItems = pedidoItems;
-    }
-
-    @Override
-    public String toString() {
-        return "Pedido{" +
-                "id=" + id +
-                ", usuario=" + usuario +
-                ", fechaPedido=" + fechaPedido +
-                ", estado='" + estado + '\'' +
-                '}';
+    public void setCarta(Carta carta) {
+        this.carta = carta;
     }
 }

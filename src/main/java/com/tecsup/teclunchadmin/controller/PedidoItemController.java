@@ -11,7 +11,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.Map;
+
 
 @RestController
 @RequestMapping("/api/pedidoItems")
@@ -26,12 +29,27 @@ public class PedidoItemController {
     @Autowired
     private ItemService itemService;
 
+    @GetMapping
+    public ResponseEntity<List<PedidoItem>> getAllPedidoItems() {
+        List<PedidoItem> pedidoItems = pedidoItemService.findAll();
+        return ResponseEntity.ok(pedidoItems);
+    }
+
     @PostMapping
-    public ResponseEntity<PedidoItem> createPedidoItem(@RequestParam Long pedidoId, @RequestParam Long itemId, @RequestParam Integer cantidad) {
+    public ResponseEntity<PedidoItem> createPedidoItem(@RequestBody Map<String, Object> payload) {
+        Long pedidoId = Long.valueOf(payload.get("pedidoId").toString());
+        Long itemId = Long.valueOf(payload.get("itemId").toString());
+        Integer cantidad = Integer.valueOf(payload.get("cantidad").toString());
+
         Optional<Pedido> pedido = pedidoService.findById(pedidoId);
         Optional<Item> item = itemService.findById(itemId);
+
         if (pedido.isPresent() && item.isPresent()) {
-            PedidoItem pedidoItem = new PedidoItem(pedido.get(), item.get(), cantidad);
+            PedidoItem pedidoItem = new PedidoItem();
+            pedidoItem.setPedido(pedido.get());
+            pedidoItem.setItem(item.get());
+            pedidoItem.setCantidad(cantidad);
+
             PedidoItem createdPedidoItem = pedidoItemService.save(pedidoItem);
             return new ResponseEntity<>(createdPedidoItem, HttpStatus.CREATED);
         } else {

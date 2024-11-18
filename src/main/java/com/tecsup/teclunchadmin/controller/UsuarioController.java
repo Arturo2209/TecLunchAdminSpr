@@ -12,7 +12,7 @@ import java.util.Optional;
 
 @RestController
 @RequestMapping("/api/usuarios")
-public class UsuarioController {
+public class    UsuarioController {
 
     @Autowired
     private UsuarioService usuarioService;
@@ -22,9 +22,9 @@ public class UsuarioController {
         return usuarioService.findAll();
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Usuario> getUsuarioById(@PathVariable String id) {
-        Optional<Usuario> usuario = usuarioService.findById(id);
+    @GetMapping("/{idInstitucional}")
+    public ResponseEntity<Usuario> getUsuarioById(@PathVariable String idInstitucional) {
+        Optional<Usuario> usuario = usuarioService.findById(idInstitucional);
         return usuario.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
     }
 
@@ -34,23 +34,11 @@ public class UsuarioController {
         return new ResponseEntity<>(createdUsuario, HttpStatus.CREATED);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Usuario> updateUsuario(@PathVariable String id, @RequestBody Usuario usuario) {
-        Optional<Usuario> existingUsuario = usuarioService.findById(id);
+    @DeleteMapping("/{idInstitucional}")
+    public ResponseEntity<Void> deleteUsuario(@PathVariable String idInstitucional) {
+        Optional<Usuario> existingUsuario = usuarioService.findById(idInstitucional);
         if (existingUsuario.isPresent()) {
-            usuario.setIdInstitucional(id);
-            Usuario updatedUsuario = usuarioService.save(usuario);
-            return ResponseEntity.ok(updatedUsuario);
-        } else {
-            return ResponseEntity.notFound().build();
-        }
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteUsuario(@PathVariable String id) {
-        Optional<Usuario> existingUsuario = usuarioService.findById(id);
-        if (existingUsuario.isPresent()) {
-            usuarioService.deleteById(id);
+            usuarioService.deleteById(idInstitucional);
             return ResponseEntity.noContent().build();
         } else {
             return ResponseEntity.notFound().build();

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.time.LocalDate;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @RestController
@@ -35,11 +36,19 @@ public class ReservaController {
     }
 
     @PostMapping
-    public ResponseEntity<Reserva> createReserva(@RequestParam String usuarioId, @RequestBody Reserva reserva) {
-        Optional<Usuario> usuario = usuarioService.findById(usuarioId); // Cambiamos el tipo de usuarioId a String
+    public ResponseEntity<Reserva> createReserva(@RequestBody Map<String, Object> request) {
+        String idInstitucional = (String) request.get("idInstitucional");
+        Optional<Usuario> usuario = usuarioService.findById(idInstitucional);
+
         if (usuario.isPresent()) {
+            Reserva reserva = new Reserva();
             reserva.setUsuario(usuario.get());
+
+            // Asignar fechaReserva y estado a partir de los datos proporcionados en el JSON
+            reserva.setFechaReserva(LocalDate.parse((String) request.get("fechaReserva")));
+            reserva.setEstado((String) request.get("estado"));
             reserva.setFechaHoraCreacion(LocalDate.now().atStartOfDay());
+
             Reserva createdReserva = reservaService.save(reserva);
             return new ResponseEntity<>(createdReserva, HttpStatus.CREATED);
         } else {

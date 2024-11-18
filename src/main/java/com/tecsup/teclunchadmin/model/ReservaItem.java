@@ -1,9 +1,10 @@
 package com.tecsup.teclunchadmin.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
 import jakarta.persistence.*;
 
 @Entity
-@Table(name = "ReservaItem")
+@Table(name = "reservaitem")
 public class ReservaItem {
 
     @Id
@@ -12,6 +13,7 @@ public class ReservaItem {
 
     @ManyToOne
     @JoinColumn(name = "reserva_id", nullable = false)
+    @JsonIgnore  // Ignorar en la serialización para evitar el bucle infinito
     private Reserva reserva;
 
     @ManyToOne
@@ -24,14 +26,14 @@ public class ReservaItem {
     // Constructor sin argumentos
     public ReservaItem() {}
 
-    // Constructor con argumentos
-    public ReservaItem(Reserva reserva, Item item, Integer cantidad) {
-        this.reserva = reserva;
+    // Constructor con argumentos (para crear una nueva instancia con pedido, item y cantidad)
+    public ReservaItem(Pedido pedido, Item item, Integer cantidad) {
+        this.reserva = pedido.getReserva();  // Esto asume que el pedido ya tiene una reserva asociada
         this.item = item;
         this.cantidad = cantidad;
     }
 
-    // Getters y Setters
+    // Getters y setters
     public Long getId() {
         return id;
     }
