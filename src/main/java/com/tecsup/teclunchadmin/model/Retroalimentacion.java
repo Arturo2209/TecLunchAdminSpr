@@ -37,7 +37,7 @@ public class Retroalimentacion {
         this.item = item;
         this.calificacion = calificacion;
         this.comentario = comentario;
-        this.fechaCreacion = LocalDateTime.now();
+        this.fechaCreacion = LocalDateTime.now();  // Establecemos la fecha de creación
     }
 
     // Getters y Setters
@@ -97,6 +97,7 @@ public class Retroalimentacion {
                 ", item=" + item +
                 ", calificacion=" + calificacion +
                 ", comentario='" + comentario + '\'' +
+                ", fechaCreacion=" + fechaCreacion +
                 '}';
     }
 }

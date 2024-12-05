@@ -13,10 +13,21 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http
-                .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers("/api/**").permitAll() // Permitir acceso sin autenticación a todas las rutas que comienzan con /api
+                .authorizeRequests(authorize -> authorize
+                        // Permite el acceso sin autenticación a rutas específicas
+                        .requestMatchers("/api/**", "/test").permitAll() // Rutas públicas para las APIs
+                        .requestMatchers("/", "/login", "/login/oauth2/code/google", "/error").permitAll() // Rutas públicas de login y redirección de Google OAuth2
+                        .anyRequest().authenticated() // Requiere autenticación para el resto de las rutas
                 )
-                .csrf(csrf -> csrf.disable()); // Desactivar CSRF para pruebas con Postman
+                .oauth2Login(oauth2 -> oauth2 // Configuración de OAuth2 con Google
+                        .loginPage("/login") // Página personalizada de login
+                        .defaultSuccessUrl("/home", true) // Redirige a la página principal después de login exitoso
+                        .failureUrl("/error") // Redirige en caso de error
+                )
+                .csrf(csrf -> csrf.disable()) // Desactivar CSRF (recomendado solo para pruebas locales, puedes habilitarlo después de validar)
+                .logout(logout -> logout
+                        .logoutSuccessUrl("/login?logout") // Redirige a la página de login después de cerrar sesión
+                );
 
         return http.build();
     }

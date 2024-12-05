@@ -1,15 +1,16 @@
 package com.tecsup.teclunchadmin.controller;
 
-import com.tecsup.teclunchadmin.model.Pedido;
 import com.tecsup.teclunchadmin.model.Transaccion;
-import com.tecsup.teclunchadmin.service.PedidoService;
+import com.tecsup.teclunchadmin.model.Pedido;
 import com.tecsup.teclunchadmin.service.TransaccionService;
+import com.tecsup.teclunchadmin.service.PedidoService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import java.time.LocalDateTime;
 
+import java.time.LocalDateTime;
+import java.util.Map;
 import java.util.List;
 import java.util.Optional;
 
@@ -23,23 +24,31 @@ public class TransaccionController {
     @Autowired
     private PedidoService pedidoService;
 
+    // Obtener todas las transacciones
     @GetMapping
-    public List<Transaccion> getAllTransacciones() {
-        return transaccionService.findAll();
+    public ResponseEntity<List<Transaccion>> getAllTransacciones() {
+        return ResponseEntity.ok(transaccionService.findAll());
     }
 
-    @GetMapping("/{id}")
-    public ResponseEntity<Transaccion> getTransaccionById(@PathVariable Long id) {
-        Optional<Transaccion> transaccion = transaccionService.findById(id);
-        return transaccion.map(ResponseEntity::ok).orElseGet(() -> ResponseEntity.notFound().build());
-    }
-
+    // Crear una transacción
     @PostMapping
-    public ResponseEntity<Transaccion> createTransaccion(@RequestParam Long pedidoId, @RequestBody Transaccion transaccion) {
+    public ResponseEntity<Transaccion> createTransaccion(@RequestBody Map<String, Object> payload) {
+        Long pedidoId = Long.valueOf(payload.get("pedidoId").toString());
+        String metodoPago = (String) payload.get("metodoPago");
+        String estado = (String) payload.get("estado");
+        Double monto = Double.valueOf(payload.get("monto").toString());
+
+        // Buscar pedido
         Optional<Pedido> pedido = pedidoService.findById(pedidoId);
+
         if (pedido.isPresent()) {
+            Transaccion transaccion = new Transaccion();
             transaccion.setPedido(pedido.get());
-            transaccion.setFecha(LocalDateTime.now());
+            transaccion.setMetodoPago(metodoPago);
+            transaccion.setEstado(estado);
+            transaccion.setMonto(monto);
+            transaccion.setFecha(LocalDateTime.now());  // Establecemos la fecha de la transacción
+
             Transaccion createdTransaccion = transaccionService.save(transaccion);
             return new ResponseEntity<>(createdTransaccion, HttpStatus.CREATED);
         } else {
@@ -47,6 +56,7 @@ public class TransaccionController {
         }
     }
 
+    // Eliminar una transacción
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteTransaccion(@PathVariable Long id) {
         Optional<Transaccion> existingTransaccion = transaccionService.findById(id);

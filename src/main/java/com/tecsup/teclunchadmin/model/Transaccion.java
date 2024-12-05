@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "Transaccion")
+@Table(name = "transaccion")
 public class Transaccion {
 
     @Id
@@ -21,7 +21,7 @@ public class Transaccion {
     @Column(name = "estado", nullable = false)
     private String estado;
 
-    @Column(name = "fecha", nullable = false)
+    @Column(name = "fecha", nullable = false) // Cambié de "fecha_transaccion" a "fecha"
     private LocalDateTime fecha;
 
     @Column(name = "monto", nullable = false)
@@ -35,7 +35,7 @@ public class Transaccion {
         this.pedido = pedido;
         this.metodoPago = metodoPago;
         this.estado = estado;
-        this.fecha = LocalDateTime.now();
+        this.fecha = LocalDateTime.now();  // Se mantiene el valor por defecto con la fecha actual
         this.monto = monto;
     }
 
